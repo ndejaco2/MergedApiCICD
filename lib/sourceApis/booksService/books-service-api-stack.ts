@@ -22,7 +22,7 @@ export class BooksServiceApiStack extends cdk.NestedStack {
 
         const schema = SchemaFile.fromAsset(path.join(__dirname, 'books.graphql'));
         this.booksApi = new GraphqlApi(this, `BooksServiceApi`, {
-            name: `${props.stageName}-Books Service`,
+            name: `${props.stageName}-Books-Service`,
             schema: schema
         });
 

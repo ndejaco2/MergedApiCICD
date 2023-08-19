@@ -4,6 +4,8 @@ import {AuthorsServiceStack} from "../lib/sourceApis/authorsService/authors-serv
 import {ReviewsServiceStack} from "../lib/sourceApis/reviewsService/reviews-service-stack";
 import {BooksServicePipelineStack} from "../lib/sourceApis/booksService/books-service-pipeline-stack";
 import {BookReviewsMergedApiPipeline} from "../lib/mergedApi/book-reviews-mergedapi-pipeline";
+import {AuthorsServicePipelineStack} from "../lib/sourceApis/authorsService/authors-service-pipeline";
+import {ReviewsServicePipelineStack} from "../lib/sourceApis/reviewsService/reviews-service-pipeline";
 
 const app = new cdk.App();
 
@@ -13,13 +15,13 @@ new BookReviewsMergedApiPipeline(app, 'BookReviewsMergedApiPipeline', {
     }
 });
 
-new AuthorsServiceStack(app, 'AuthorsServiceStack', {
+new AuthorsServicePipelineStack(app, 'AuthorsServiceStack', {
     env: {
         region: 'us-east-1'
     }
 });
 
-new ReviewsServiceStack(app, 'ReviewsServiceStack', {
+new ReviewsServicePipelineStack(app, 'ReviewsServiceStack', {
     env: {
         region: 'us-east-1'
     },

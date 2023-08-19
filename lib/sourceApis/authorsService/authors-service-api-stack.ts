@@ -17,11 +17,11 @@ export class AuthorsServiceApiStack extends cdk.NestedStack {
     private authorsDatasource: BaseDataSource;
     public readonly authorsApi: IGraphqlApi;
 
-    constructor(scope: Construct, id: string) {
+    constructor(scope: Construct, id: string, props: cdk.StageProps) {
         super(scope, id);
         const schema = SchemaFile.fromAsset(path.join(__dirname, 'authors.graphql'));
         this.authorsApi = new GraphqlApi(this, 'AuthorsServiceApi', {
-            name: 'Authors Service',
+            name: `${props.stageName}-Authors-Service`,
             schema: schema
         });
 
@@ -30,7 +30,7 @@ export class AuthorsServiceApiStack extends cdk.NestedStack {
                 name: 'id',
                 type: AttributeType.STRING
             },
-            tableName: 'AuthorsTable',
+            tableName: `${props.stageName}-AuthorsTable`,
         });
 
         this.authorsDatasource = new DynamoDbDataSource(this, 'AuthorsDatasource', {

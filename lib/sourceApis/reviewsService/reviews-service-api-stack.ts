@@ -16,13 +16,13 @@ export class ReviewsServiceApiStack extends cdk.NestedStack {
     public readonly bookReviewsApi: IGraphqlApi;
     private bookReviewsDatasource: BaseDataSource;
 
-    constructor(scope: Construct, id: string) {
+    constructor(scope: Construct, id: string, props: cdk.StageProps) {
         super(scope, id);
 
         const schema = SchemaFile.fromAsset(path.join(__dirname, 'reviews.graphql'));
 
         this.bookReviewsApi = new GraphqlApi(this, 'ReviewsServiceApi', {
-            name: 'Reviews Service',
+            name: `${props.stageName}-Reviews-Service`,
             schema: schema
         });
 
@@ -31,7 +31,7 @@ export class ReviewsServiceApiStack extends cdk.NestedStack {
                 name: 'id',
                 type: AttributeType.STRING
             },
-            tableName: 'BookReviewsTable',
+            tableName: `${props.stageName}-BookReviewsTable`,
         });
 
         bookReviewsTable.addGlobalSecondaryIndex({

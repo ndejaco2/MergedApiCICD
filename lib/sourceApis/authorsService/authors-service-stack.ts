@@ -4,10 +4,10 @@ import {AuthorsServiceApiStack } from "./authors-service-api-stack";
 import {MergeType, SourceApiAssociationConstruct} from "../../constructs/source-api-association-construct";
 
 export class AuthorsServiceStack extends cdk.Stack {
-    constructor(scope: Construct, id: string, props: cdk.StackProps) {
+    constructor(scope: Construct, id: string, props: cdk.StageProps) {
         super(scope, id);
 
-        const authorsServiceApiStack = new AuthorsServiceApiStack(this, 'AuthorsServiceApiStack');
+        const authorsServiceApiStack = new AuthorsServiceApiStack(this, 'AuthorsServiceApiStack', props);
 
         // Associates this api to the BookReviewsMergedApi
         // This will run a custom resource to merge changes to the Book Reviews Merged API whenever the authors stack is deployed
