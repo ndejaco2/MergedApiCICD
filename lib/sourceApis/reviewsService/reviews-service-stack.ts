@@ -14,8 +14,8 @@ export class ReviewsServiceStack extends cdk.Stack {
         const sourceApiAssociation = new SourceApiAssociationConstruct(this, 'SourceApiAssociation', {
             description: "Authors service API which handles the authors metadata in the system.",
             mergeType: MergeType.MANUAL_MERGE,
-            mergedApiArn: cdk.Fn.importValue("BookReviewsMergedApiArn"),
-            mergedApiId: cdk.Fn.importValue("BookReviewsMergedApiId"),
+            mergedApiArn: cdk.Fn.importValue(`${props.stageName}-BookReviewsMergedApiArn`),
+            mergedApiId: cdk.Fn.importValue(`${props.stageName}-BookReviewsMergedApiId`),
             sourceApiArn: reviewsServiceApiStack.bookReviewsApi.arn,
             sourceApiId: reviewsServiceApiStack.bookReviewsApi.apiId
         });
