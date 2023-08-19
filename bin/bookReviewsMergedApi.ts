@@ -26,7 +26,7 @@ new ReviewsServiceStack(app, 'ReviewsServiceStack', {
     },
 });
 
-new BooksServicePipelineStack(app, 'BooksServiceStack', {
+new BooksServicePipelineStack(app, 'BooksServicePipeline', {
     env: {
         region: 'us-east-1'
     },

@@ -7,13 +7,13 @@ import {SecretValue} from "aws-cdk-lib";
 export class BooksServicePipelineStack extends cdk.Stack {
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
-        const githubAccessToken = SecretValue.secretsManager('github-token-2023-08-18')
+        const githubAccessToken = SecretValue.secretsManager('github-token')
         const pipeline = new CodePipeline(this, 'BooksServicePipeline', {
             synth: new ShellStep('Synth', {
                 input: CodePipelineSource.gitHub('ndejaco2/MergedApiCICD', "main",  {
                     authentication: githubAccessToken
                 }),
-                commands: ["npm run build", "npx cdk synth"]
+                commands: ["npm ci", "npm run build", "npx cdk synth"]
             }),
             pipelineName: 'BooksServicePipeline',
         });
