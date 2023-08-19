@@ -18,21 +18,14 @@ export class BooksServicePipelineStack extends cdk.Stack {
             pipelineName: 'BooksServicePipeline',
         });
 
-        pipeline.addStage(new BooksServiceStage(this, "BooksServiceBetaStage", {
+        pipeline.addStage(new BooksServiceStage(this, "BooksServiceStage", {
             env: {
                 region: "us-east-1"
             },
             stageName: 'beta'
         }));
 
-        pipeline.addStage(new BooksServiceStage(this, "BooksServiceGammaStage", {
-            env: {
-                region: "us-east-1"
-            },
-            stageName: 'gamma'
-        }));
-
-        pipeline.addStage(new BooksServiceStage(this, "BooksServiceProdStage", {
+        pipeline.addStage(new BooksServiceStage(this, "BooksServiceStage", {
             env: {
                 region: "us-east-1"
             },

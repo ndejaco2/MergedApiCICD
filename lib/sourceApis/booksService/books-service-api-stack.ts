@@ -22,7 +22,7 @@ export class BooksServiceApiStack extends cdk.NestedStack {
 
         const schema = SchemaFile.fromAsset(path.join(__dirname, 'books.graphql'));
         this.booksApi = new GraphqlApi(this, `BooksServiceApi-${props.stageName}`, {
-            name: 'Books Service',
+            name: `${props.stageName}-Books Service`,
             schema: schema
         });
 
@@ -31,7 +31,7 @@ export class BooksServiceApiStack extends cdk.NestedStack {
                 name: 'id',
                 type: AttributeType.STRING
             },
-            tableName: 'BooksTable',
+            tableName: `${props.stageName}-BooksTable`,
         });
 
         booksTable.addGlobalSecondaryIndex({
@@ -56,25 +56,25 @@ export class BooksServiceApiStack extends cdk.NestedStack {
         });
 
         // Mutation to add a book in the datasource
-        this.addJSUnitResolver(`CreateBookResolver-${props.stageName}`, "Mutation", "createBook", "createBook")
+        this.addJSUnitResolver(`CreateBookResolver`, "Mutation", "createBook", "createBook")
 
         // Mutation to delete a book from the datasource
-        this.addJSUnitResolver(`DeleteBookResolver-${props.stageName}`, "Mutation", "deleteBook", "deleteBook")
+        this.addJSUnitResolver(`DeleteBookResolver`, "Mutation", "deleteBook", "deleteBook")
 
         // Mutation to update a book in the datasource
         // this.addJSUnitResolver(`UpdateBookResolver', "Mutation", "updateBook", "updateBook")
 
         // Query to get book by id
-        this.addJSUnitResolver(`GetBookResolver-${props.stageName}`, "Query", "getBook", "getBook")
+        this.addJSUnitResolver(`GetBookResolver`, "Query", "getBook", "getBook")
 
         // Query to list all books in the datasource
-        this.addJSUnitResolver(`ListBooksResolver-${props.stageName}`, "Query", "listBooks", "listBooks")
+        this.addJSUnitResolver(`ListBooksResolver`, "Query", "listBooks", "listBooks")
 
         // Query to join book data with the review data to return data about the book for a given review.
-        this.addJSUnitResolver(`GetBookForReviewResolver-${props.stageName}`, "Review", "book", "getBookForReview")
+        this.addJSUnitResolver(`GetBookForReviewResolver`, "Review", "book", "getBookForReview")
 
         // Query to join book data with the author data to return data about all books a given author has written.
-        this.addJSUnitResolver(`GetBooksForAuthorResolver-${props.stageName}`, "Author", "books", "getBooksForAuthor")
+        this.addJSUnitResolver(`GetBooksForAuthorResolver`, "Author", "books", "getBooksForAuthor")
     }
 
     addJSUnitResolver(id: string,
