@@ -11,7 +11,7 @@ This project includes 3 source AppSync APIs with resolvers written in Typescript
 Also, it contains a Merged API which is able to integrate these 3 services into a single endpoint. This is known as the Book Reviews Merged API following the same example as the previous blog (https://aws.amazon.com/blogs/mobile/introducing-merged-apis-on-aws-appsync/).
 
 
-![image](https://github.com/ndejaco2/MergedApiCICD/assets/54116900/a8ff6afa-ed2d-4874-b3d6-f341c9ad2f61)
+![mergedApi](https://github.com/ndejaco2/MergedApiCICD/assets/54116900/71e8d0fe-0b4a-4d27-bbfa-63cc9ff3593f)
 
 
 * While this sample configures the stacks in the same repository for simplicity, each API has its own CodePipeline for deployment as these will be managed by separate teams. Each CodePipline has a beta stage, which is recommended for initial integration tests and staging, as well as a production stage.
