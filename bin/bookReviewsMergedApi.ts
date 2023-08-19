@@ -15,13 +15,13 @@ new BookReviewsMergedApiPipeline(app, 'BookReviewsMergedApiPipeline', {
     }
 });
 
-new AuthorsServicePipelineStack(app, 'AuthorsServiceStack', {
+new AuthorsServicePipelineStack(app, 'AuthorsServicePipeline', {
     env: {
         region: 'us-east-1'
     }
 });
 
-new ReviewsServicePipelineStack(app, 'ReviewsServiceStack', {
+new ReviewsServicePipelineStack(app, 'ReviewsServicePipeline', {
     env: {
         region: 'us-east-1'
     },
