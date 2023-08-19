@@ -21,12 +21,12 @@ export class BooksServiceApiStack extends cdk.NestedStack {
         super(scope, id);
 
         const schema = SchemaFile.fromAsset(path.join(__dirname, 'books.graphql'));
-        this.booksApi = new GraphqlApi(this, `BooksServiceApi-${props.stageName}`, {
+        this.booksApi = new GraphqlApi(this, `BooksServiceApi`, {
             name: `${props.stageName}-Books Service`,
             schema: schema
         });
 
-        const booksTable = new Table(this, `BooksDDBTable-${props.stageName}`, {
+        const booksTable = new Table(this, `BooksDDBTable`, {
             partitionKey: {
                 name: 'id',
                 type: AttributeType.STRING
@@ -50,7 +50,7 @@ export class BooksServiceApiStack extends cdk.NestedStack {
             indexName: 'book-publisher-index'
         });
 
-        this.booksDatasource = new DynamoDbDataSource(this, `BooksDatasource-${props.stageName}`, {
+        this.booksDatasource = new DynamoDbDataSource(this, `BooksDatasource`, {
             api: this.booksApi,
             table: booksTable
         });

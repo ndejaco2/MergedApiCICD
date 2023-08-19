@@ -4,13 +4,10 @@ import {CfnGraphQLApi} from "aws-cdk-lib/aws-appsync";
 import {Role, ServicePrincipal} from "aws-cdk-lib/aws-iam";
 import {CfnOutput} from "aws-cdk-lib";
 
-export interface BookReviewsMergedApiStackProps  extends cdk.StackProps {
-}
-
 export class BookReviewsMergedApiStack extends cdk.Stack {
   private bookReviewsMergedApi: CfnGraphQLApi;
 
-  constructor(scope: Construct, id: string, props: BookReviewsMergedApiStackProps) {
+  constructor(scope: Construct, id: string, props: cdk.StageProps) {
     super(scope, id, props);
 
     const executionRole = new Role(this, 'MergedApiExecutionRole', {
@@ -19,18 +16,18 @@ export class BookReviewsMergedApiStack extends cdk.Stack {
 
     this.bookReviewsMergedApi = new CfnGraphQLApi(this, 'BookReviewsMergedApi', {
       authenticationType: "API_KEY",
-      name: 'BookReviewsMergedApi',
+      name: `${props.stageName}-BookReviewsMergedApi`,
       apiType: 'MERGED',
       mergedApiExecutionRoleArn: executionRole.roleArn,
     });
 
     new CfnOutput(this, 'BookReviewsMergedApiArn', {
-      exportName: 'BookReviewsMergedApiArn',
+      exportName: `${props.stageName}-BookReviewsMergedApiArn`,
       value: this.bookReviewsMergedApi.attrArn
     })
 
     new CfnOutput(this, 'BookReviewsMergedApiId', {
-      exportName: 'BookReviewsMergedApiId',
+      exportName: `${props.stageName}-BookReviewsMergedApiId`,
       value: this.bookReviewsMergedApi.attrApiId
     });
   }
