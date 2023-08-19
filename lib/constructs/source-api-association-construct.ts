@@ -1,8 +1,10 @@
 import {Construct} from "constructs";
 import {CfnSourceApiAssociation} from "aws-cdk-lib/aws-appsync";
-import {CustomResource, CustomResourceProvider, CustomResourceProviderRuntime} from "aws-cdk-lib";
-import * as cdk from "aws-cdk-lib";
+import * as lambda from "aws-cdk-lib/aws-lambda-nodejs";
+import {CustomResource, Duration} from "aws-cdk-lib";
 import * as path from "path";
+import {Runtime} from "aws-cdk-lib/aws-lambda";
+import {Effect, ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from "aws-cdk-lib/aws-iam";
 
 
 export interface SourceApiAssociationProps {
@@ -32,26 +34,39 @@ export class SourceApiAssociationConstruct extends Construct {
             }
         });
 
-
         // If the source api association is using manual merge mode, we will ensure that any time the source api stack is deployed,
         // we merge the changes and wait for them to succeed.
-        if (props.mergeType == MergeType.MANUAL_MERGE) {
+        if (props.mergeType === MergeType.MANUAL_MERGE) {
             const resourceType = 'Custom::SourceApiMergeOperation'
-            const startMergeOperationHandler = CustomResourceProvider.getOrCreate(this, resourceType, {
-                codeDirectory: path.join(__dirname, 'mergeSourceApiSchemaFunction'),
-                runtime: CustomResourceProviderRuntime.NODEJS_18_X,
-                timeout: cdk.Duration.minutes(10),
-                description: "Lambda function for submitting and validating a merge operation to import the latest changes from a source API",
-                policyStatements:  [{
-                    Effect: 'Allow',
-                    Resource: props.mergedApiArn.concat(`/${sourceApiAssociation.attrAssociationId}`),
-                    Action: ['appsync:StartSchemaMerge', 'appsync:GetSourceApiAssociation'],
-                }]
+            const lambdaRole = new Role(this, 'MergeSourceApiSchemaExecutionRole', {
+                assumedBy: new ServicePrincipal('lambda.amazonaws.com'),
             });
 
-            const mergeSourceApiToMergedApiFunction = new CustomResource(this, `StartMergeCustomResource`, {
-                serviceToken: startMergeOperationHandler,
+            lambdaRole.addToPolicy(new PolicyStatement({
+                effect: Effect.ALLOW,
+                resources: [props.mergedApiArn.concat(`/sourceApiAssociations/${sourceApiAssociation.attrAssociationId}`)],
+                actions: ['appsync:StartSchemaMerge', 'appsync:GetSourceApiAssociation']
+            }));
+
+            lambdaRole.addManagedPolicy(
+                ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole'));
+
+            const schemaMergeLambda = new lambda.NodejsFunction(this, `MergeSourceApiSchemaLambda`, {
+                runtime: Runtime.NODEJS_18_X,
+                entry: path.join(__dirname, 'mergeSourceApiSchemaFunction', 'index.ts'),
+                handler: 'handler',
+                role: lambdaRole,
+                memorySize: 512,
+                timeout: Duration.minutes(5),
+                bundling: {
+                    externalModules: [], // Forces upload of more recent version of aws-sdk/client-appsync to be used in Lambda runtime.
+                }
+            });
+
+            new CustomResource(this, `StartSchemaMergeCustomResource`, {
+                serviceToken: schemaMergeLambda.functionArn,
                 resourceType: resourceType,
+
                 properties: {
                     ...props,
                     associationId: sourceApiAssociation.attrAssociationId,

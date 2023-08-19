@@ -3,11 +3,11 @@ import * as cdk from 'aws-cdk-lib';
 import { BookReviewsMergedApiStack} from '../lib/mergedApi/book-reviews-mergedapi-stack';
 import {AuthorsServiceStack} from "../lib/sourceApis/authorsService/authors-service-stack";
 import {ReviewsServiceStack} from "../lib/sourceApis/reviewsService/reviews-service-stack";
-import {BooksServiceStack} from "../lib/sourceApis/booksService/books-service-stack";
+import {BooksServicePipelineStack} from "../lib/sourceApis/booksService/books-service-pipeline-stack";
 
 const app = new cdk.App();
 
-const bookReviewsMergedApiStack = new BookReviewsMergedApiStack(app, 'BookReviewsMergedApi', {
+new BookReviewsMergedApiStack(app, 'BookReviewsMergedApi', {
     env: {
         region: 'us-east-1',
     }
@@ -26,7 +26,7 @@ new ReviewsServiceStack(app, 'ReviewsServiceStack', {
     },
 });
 
-new BooksServiceStack(app, 'BooksServiceStack', {
+new BooksServicePipelineStack(app, 'BooksServiceStack', {
     env: {
         region: 'us-east-1'
     },

@@ -1,107 +1,25 @@
 import * as cdk from "aws-cdk-lib";
-import * as path from "path";
 import {Construct} from "constructs";
-import {
-    BaseDataSource, CfnGraphQLApi,
-    Code,
-    DynamoDbDataSource,
-    FunctionRuntime,
-    GraphqlApi, IGraphqlApi,
-    Resolver,
-    SchemaFile
-} from "aws-cdk-lib/aws-appsync";
-import {AttributeType, Table} from "aws-cdk-lib/aws-dynamodb";
-
-export interface ReviewsServiceStackProps extends cdk.StackProps {
-
-}
-
+import {MergeType, SourceApiAssociationConstruct} from "../../constructs/source-api-association-construct";
+import {ReviewsServiceApiStack} from "./reviews-service-api-stack";
 
 export class ReviewsServiceStack extends cdk.Stack {
-    private bookReviewsApi: IGraphqlApi;
-    private bookReviewsDatasource: BaseDataSource;
-
-    constructor(scope: Construct, id: string, props: ReviewsServiceStackProps) {
+    constructor(scope: Construct, id: string, props: cdk.StackProps) {
         super(scope, id, props);
 
-        const schema = SchemaFile.fromAsset(path.join(__dirname, 'reviews.graphql'));
+        const reviewsServiceApiStack = new ReviewsServiceApiStack(this, 'ReviewsServiceApiStack');
 
-        this.bookReviewsApi = new GraphqlApi(this, 'ReviewsServiceApi', {
-            name: 'Reviews Service',
-            schema: schema
+        // Associates this api to the BookReviewsMergedApi
+        // This will run a custom resource to merge changes to the Book Reviews Merged API whenever the authors stack is deployed
+        const sourceApiAssociation = new SourceApiAssociationConstruct(this, 'SourceApiAssociation', {
+            description: "Authors service API which handles the authors metadata in the system.",
+            mergeType: MergeType.MANUAL_MERGE,
+            mergedApiArn: cdk.Fn.importValue("BookReviewsMergedApiArn"),
+            mergedApiId: cdk.Fn.importValue("BookReviewsMergedApiId"),
+            sourceApiArn: reviewsServiceApiStack.bookReviewsApi.arn,
+            sourceApiId: reviewsServiceApiStack.bookReviewsApi.apiId
         });
 
-        const bookReviewsTable = new Table(this, 'ReviewsDDBTable', {
-            partitionKey: {
-                name: 'id',
-                type: AttributeType.STRING
-            },
-            tableName: 'BookReviewsTable',
-        });
-
-        bookReviewsTable.addGlobalSecondaryIndex({
-            partitionKey: {
-                name: 'bookId',
-                type: AttributeType.STRING
-            },
-            indexName: 'review-book-index'
-        });
-
-        bookReviewsTable.addGlobalSecondaryIndex({
-            partitionKey: {
-                name: 'reviewerId',
-                type: AttributeType.STRING
-            },
-            indexName: 'review-reviewer-index'
-        });
-
-        bookReviewsTable.addGlobalSecondaryIndex({
-            partitionKey: {
-                name: 'authorId',
-                type: AttributeType.STRING
-            },
-            indexName: 'review-author-index'
-        });
-
-
-        this.bookReviewsDatasource = new DynamoDbDataSource(this, 'BookReviewsDatasource', {
-            api: this.bookReviewsApi,
-            table: bookReviewsTable
-        });
-
-        // Mutation to add a review in the datasource
-        this.addJSUnitResolver('CreateReviewResolver', "Mutation", "createReview", "createReview")
-
-        // Mutation to delete a review from the datasource
-        this.addJSUnitResolver('DeleteReviewResolver', "Mutation", "deleteReview", "deleteReview")
-
-        // Mutation to update a review in the datasource
-        this.addJSUnitResolver('UpdateReviewResolver', "Mutation", "updateReview", "updateReview")
-
-        // Query to get review by id
-        this.addJSUnitResolver('GetReviewResolver', "Query", "get", "getReview")
-
-        // Query to list all reviews in the datasource
-        this.addJSUnitResolver('ListBooksResolver', "Query", "listReviews", "listReviews")
-
-        // Query to join review data with the author data to return data for all reviews of books written by an individual author.
-        this.addJSUnitResolver('GetReviewsForAuthorResolver', "Author", "reviews", "getReviewsForAuthor")
-
-        // Query to join review data with the book data to return data for all reviews of an individual book.
-        this.addJSUnitResolver('GetReviewsForBookResolver', "Book", "reviews", "getReviewsForBook")
-    }
-
-    addJSUnitResolver(id: string,
-                      typeName: string,
-                      fieldName: string,
-                      fileName: string) {
-        new Resolver(this, id, {
-            api: this.bookReviewsApi,
-            fieldName: fieldName,
-            typeName: typeName,
-            dataSource: this.bookReviewsDatasource,
-            code: Code.fromAsset(path.join(__dirname, `resolverCode/${fileName}.js`)),
-            runtime: FunctionRuntime.JS_1_0_0
-        });
+        sourceApiAssociation.node.addDependency(reviewsServiceApiStack);
     }
 }

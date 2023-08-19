@@ -13,16 +13,12 @@ import {
 } from "aws-cdk-lib/aws-appsync";
 import {AttributeType, Table} from "aws-cdk-lib/aws-dynamodb";;
 
-export interface AuthorsServiceStackProps extends cdk.StackProps {
-
-}
-
-export class AuthorsServiceApiStack extends cdk.Stack {
+export class AuthorsServiceApiStack extends cdk.NestedStack {
     private authorsDatasource: BaseDataSource;
     public readonly authorsApi: IGraphqlApi;
 
-    constructor(scope: Construct, id: string, props: AuthorsServiceStackProps) {
-        super(scope, id, props);
+    constructor(scope: Construct, id: string) {
+        super(scope, id);
         const schema = SchemaFile.fromAsset(path.join(__dirname, 'authors.graphql'));
         this.authorsApi = new GraphqlApi(this, 'AuthorsServiceApi', {
             name: 'Authors Service',
