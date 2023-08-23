@@ -4,7 +4,7 @@ import * as lambda from "aws-cdk-lib/aws-lambda-nodejs";
 import {CustomResource, Duration} from "aws-cdk-lib";
 import * as path from "path";
 import {Runtime} from "aws-cdk-lib/aws-lambda";
-import {Effect, ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from "aws-cdk-lib/aws-iam";
+import {Effect, ManagedPolicy, Policy, PolicyStatement, IRole, ServicePrincipal, Role} from "aws-cdk-lib/aws-iam";
 
 
 export interface SourceApiAssociationProps {
@@ -14,6 +14,7 @@ export interface SourceApiAssociationProps {
     sourceApiId: string,
     description: string
     mergeType: MergeType,
+    mergedApiExecutionRole: IRole
 }
 
 export enum MergeType {
@@ -33,6 +34,20 @@ export class SourceApiAssociationConstruct extends Construct {
                 mergeType: props.mergeType.toString()
             }
         });
+
+        const accessPolicy = new Policy(this, 'SourceApiAccessPolicy', {
+            statements: [new PolicyStatement({
+                actions: ['appsync:SourceGraphQL'],
+                resources: [props.sourceApiArn, props.sourceApiArn.concat("/*")],
+                effect: Effect.ALLOW
+            }), new PolicyStatement({
+                actions: ['appsync:StartSchemaMerge'],
+                resources: [sourceApiAssociation.attrAssociationArn],
+                effect: Effect.ALLOW
+            })]
+        });
+
+        props.mergedApiExecutionRole.attachInlinePolicy(accessPolicy);
 
         // If the source api association is using manual merge mode, we will ensure that any time the source api stack is deployed,
         // we merge the changes and wait for them to succeed.

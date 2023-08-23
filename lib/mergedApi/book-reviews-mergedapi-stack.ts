@@ -30,5 +30,10 @@ export class BookReviewsMergedApiStack extends cdk.Stack {
       exportName: `${props.stageName}-BookReviewsMergedApiId`,
       value: this.bookReviewsMergedApi.attrApiId
     });
+
+    new CfnOutput(this, 'BookReviewsMergedApiExecutionRole', {
+      exportName: `${props.stageName}-BookReviewsMergedApiExecutionRoleArn`,
+      value: executionRole.roleArn
+    })
   }
 }
