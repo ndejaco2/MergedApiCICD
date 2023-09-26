@@ -1,8 +1,12 @@
 import * as cdk from "aws-cdk-lib";
-import {Construct} from "constructs";
-import {AuthorsServiceApiStack} from "./authors-service-api-stack";
-import {MergeType, SourceApiAssociationConstruct} from "../../constructs/source-api-association-construct";
-import {Effect, Policy, PolicyStatement, Role} from "aws-cdk-lib/aws-iam";
+import { Construct } from "constructs";
+import { AuthorsServiceApiStack } from "./authors-service-api-stack";
+import { Role } from "aws-cdk-lib/aws-iam";
+import { GraphqlApi, SourceApiAssociation, MergeType } from "aws-cdk-lib/aws-appsync";
+import {
+    SourceApiAssociationMergeOperation,
+    SourceApiAssociationMergeOperationProvider
+} from "../../constructs/source-api-association-merge";
 
 export class AuthorsServiceStack extends cdk.Stack {
     constructor(scope: Construct, id: string, props: cdk.StageProps) {
@@ -13,18 +17,30 @@ export class AuthorsServiceStack extends cdk.Stack {
         const mergedApiExecutionRole = Role.fromRoleArn(this, 'MergedApiExecutionRole',
             cdk.Fn.importValue(`${props.stageName}-BookReviewsMergedApiExecutionRoleArn`))
 
-        // Associates this api to the BookReviewsMergedApi
-        // This will run a custom resource to merge changes to the Book Reviews Merged API whenever the authors stack is deployed
-        const sourceApiAssociation = new SourceApiAssociationConstruct(this, 'SourceApiAssociation', {
-            description: "Authors service API which handles the authors metadata in the system.",
-            mergeType: MergeType.MANUAL_MERGE,
-            mergedApiArn: cdk.Fn.importValue(`${props.stageName}-BookReviewsMergedApiArn`),
-            mergedApiId: cdk.Fn.importValue(`${props.stageName}-BookReviewsMergedApiId`),
-            sourceApiArn: authorsServiceApiStack.authorsApi.arn,
-            sourceApiId: authorsServiceApiStack.authorsApi.apiId,
-            mergedApiExecutionRole: mergedApiExecutionRole
+        const mergedApiArn = cdk.Fn.importValue(`${props.stageName}-BookReviewsMergedApiArn`)
+        const mergedApiId = cdk.Fn.importValue(`${props.stageName}-BookReviewsMergedApiId`)
+
+        const mergedApi = GraphqlApi.fromGraphqlApiAttributes(this, 'MergedApi', {
+            graphqlApiArn: mergedApiArn,
+            graphqlApiId: mergedApiId,
         });
 
-        sourceApiAssociation.node.addDependency(authorsServiceApiStack);
+        // Associates this api to the BookReviewsMergedApi
+        const sourceApiAssociation = new SourceApiAssociation(this, 'BooksSourceApiAssociation', {
+            sourceApi: authorsServiceApiStack.authorsApi,
+            mergedApi: mergedApi,
+            mergedApiExecutionRole: mergedApiExecutionRole,
+            mergeType: MergeType.MANUAL_MERGE,
+        });
+
+        const schemaMergeProvider = new SourceApiAssociationMergeOperationProvider(this, 'MergeProvider');
+
+        const manualMergeHandler = new SourceApiAssociationMergeOperation(this, 'ManualMergeOperation', {
+            sourceApiAssociation: sourceApiAssociation,
+            mergeOperationProvider: schemaMergeProvider,
+            alwaysMergeOnStackUpdate: true,
+        });
+
+        manualMergeHandler.node.addDependency(authorsServiceApiStack);
     }
 }

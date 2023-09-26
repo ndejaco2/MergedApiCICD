@@ -13,7 +13,7 @@ import {
 import {AttributeType, Table} from "aws-cdk-lib/aws-dynamodb";
 
 export class ReviewsServiceApiStack extends cdk.NestedStack {
-    public readonly bookReviewsApi: IGraphqlApi;
+    public readonly reviewsApi: IGraphqlApi;
     private bookReviewsDatasource: BaseDataSource;
 
     constructor(scope: Construct, id: string, props: cdk.StageProps) {
@@ -21,7 +21,7 @@ export class ReviewsServiceApiStack extends cdk.NestedStack {
 
         const schema = SchemaFile.fromAsset(path.join(__dirname, 'reviews.graphql'));
 
-        this.bookReviewsApi = new GraphqlApi(this, 'ReviewsServiceApi', {
+        this.reviewsApi = new GraphqlApi(this, 'ReviewsServiceApi', {
             name: `${props.stageName}-Reviews-Service`,
             schema: schema
         });
@@ -60,7 +60,7 @@ export class ReviewsServiceApiStack extends cdk.NestedStack {
 
 
         this.bookReviewsDatasource = new DynamoDbDataSource(this, 'BookReviewsDatasource', {
-            api: this.bookReviewsApi,
+            api: this.reviewsApi,
             table: bookReviewsTable
         });
 
@@ -91,7 +91,7 @@ export class ReviewsServiceApiStack extends cdk.NestedStack {
                       fieldName: string,
                       fileName: string) {
         new Resolver(this, id, {
-            api: this.bookReviewsApi,
+            api: this.reviewsApi,
             fieldName: fieldName,
             typeName: typeName,
             dataSource: this.bookReviewsDatasource,
