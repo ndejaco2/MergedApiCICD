@@ -16,6 +16,10 @@ type Book {
     author: Author
 }
 
+input CreateReviewInput {
+    bookId: String!
+}
+
 input CreateAuthorInput {
     name: String!
     bio: String
