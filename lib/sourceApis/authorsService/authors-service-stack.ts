@@ -3,10 +3,7 @@ import { Construct } from "constructs";
 import { AuthorsServiceApiStack } from "./authors-service-api-stack";
 import { Role } from "aws-cdk-lib/aws-iam";
 import { GraphqlApi, SourceApiAssociation, MergeType } from "aws-cdk-lib/aws-appsync";
-import {
-    SourceApiAssociationMergeOperation,
-    SourceApiAssociationMergeOperationProvider
-} from "../../constructs/source-api-association-merge";
+import {SourceApiAssociationMergeOperation} from "awscdk-appsync-utils";
 
 export class AuthorsServiceStack extends cdk.Stack {
     constructor(scope: Construct, id: string, props: cdk.StageProps) {
@@ -33,14 +30,9 @@ export class AuthorsServiceStack extends cdk.Stack {
             mergeType: MergeType.MANUAL_MERGE,
         });
 
-        const schemaMergeProvider = new SourceApiAssociationMergeOperationProvider(this, 'MergeProvider');
-
-        const manualMergeHandler = new SourceApiAssociationMergeOperation(this, 'ManualMergeOperation', {
+        const mergeOperation= new SourceApiAssociationMergeOperation(this, 'SourceApiMergeOperation', {
             sourceApiAssociation: sourceApiAssociation,
-            mergeOperationProvider: schemaMergeProvider,
-            alwaysMergeOnStackUpdate: true,
+            alwaysMergeOnStackUpdate: true
         });
-
-        manualMergeHandler.node.addDependency(authorsServiceApiStack);
     }
 }
