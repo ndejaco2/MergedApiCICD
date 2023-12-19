@@ -12,7 +12,7 @@ type AuthorConnection {
 }
 
 type Book {
-    id: String!
+    id: ID!
     author: Author
 }
 
