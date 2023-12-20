@@ -4,7 +4,6 @@ import {CodeBuildStep, CodePipeline, CodePipelineSource, ShellStep} from 'aws-cd
 import {SecretValue} from "aws-cdk-lib";
 import {AuthorsServiceStage} from "./authors-service-stage";
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
-import { AuthorsServiceSourceApiAssociationStage } from './authors-service-source-api-assoc-stage';
 
 export class AuthorsServicePipelineStack extends cdk.Stack {
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {

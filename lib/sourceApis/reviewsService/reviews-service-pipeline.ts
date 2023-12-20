@@ -3,7 +3,6 @@ import { Construct } from 'constructs';
 import {CodeBuildStep, CodePipeline, CodePipelineSource, ShellStep} from 'aws-cdk-lib/pipelines';
 import {SecretValue} from "aws-cdk-lib";
 import {ReviewsServiceStage} from "./reviews-service-stage";
-import { ReviewsServiceSourceApiAssociationStage } from './reviews-service-source-api-assoc-stage';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 
 export class ReviewsServicePipelineStack extends cdk.Stack {

@@ -25,6 +25,7 @@
     "@aws-appsync/utils": "^1.2.6",
     "@aws-sdk/client-appsync": "^3.476.0",
     "@aws-sdk/client-cloudformation": "^3.477.0",
+    "@aws-sdk/credential-provider-node": "^3.477.0",
     "@aws-sdk/signature-v4": "^3.374.0",
     "aws-cdk-lib": "^2.99.0",
     "awscdk-appsync-utils": "^0.0.238",

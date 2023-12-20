@@ -3,7 +3,6 @@ import { Construct } from 'constructs';
 import {CodeBuildStep, CodePipeline, CodePipelineSource, ShellStep} from 'aws-cdk-lib/pipelines';
 import {BooksServiceStage} from "./books-service-stage";
 import {SecretValue} from "aws-cdk-lib";
-import { BooksServiceSourceApiAssociationStage } from './books-service-source-api-assoc-stage';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 
 export class BooksServicePipelineStack extends cdk.Stack {
