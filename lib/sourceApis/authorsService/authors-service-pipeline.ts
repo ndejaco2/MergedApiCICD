@@ -77,7 +77,7 @@ export class AuthorsServicePipelineStack extends cdk.Stack {
 
         pipeline.addStage(sourceApiProdStage, {
             post: [ 
-                new CodeBuildStep('Integ-Test-Prod-Source-Api', {
+                new CodeBuildStep('Integ-Test-Prod-SourceApi', {
                     env: {
                         Stage: 'prod',
                         AWS_REGION: region
@@ -86,6 +86,20 @@ export class AuthorsServicePipelineStack extends cdk.Stack {
                         "npm ci",
                         "npm run build",
                         "npm test integ-tests/sourceApis/authorsService",
+                    ],
+                    rolePolicyStatements: [
+                        integTestPolicyStatement,
+                    ]
+                }),
+                new CodeBuildStep('Integ-Test-Prod-MergedApi', {
+                    env: {
+                        Stage: 'prod',
+                        AWS_REGION: region
+                    },
+                    commands: [
+                        "npm ci",
+                        "npm run build",
+                        "npm test test/integ-tests/mergedApi"
                     ],
                     rolePolicyStatements: [
                         integTestPolicyStatement,

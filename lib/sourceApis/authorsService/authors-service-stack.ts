@@ -25,7 +25,7 @@ export class AuthorsServiceStack extends cdk.Stack {
         });
 
         // Associates this api to the BookReviewsMergedApi
-        const sourceApiAssociation = new SourceApiAssociation(this, 'BooksSourceApiAssociation', {
+        const sourceApiAssociation = new SourceApiAssociation(this, 'AuthorsSourceApiAssociation', {
             sourceApi: authorsServiceApi.authorsApi,
             mergedApi: mergedApi,
             mergedApiExecutionRole: mergedApiExecutionRole,

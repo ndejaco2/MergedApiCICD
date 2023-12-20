@@ -1,22 +1,16 @@
 import { SignatureV4 } from "@smithy/signature-v4";
 import axios from "axios";
 import { Sha256 } from '@aws-crypto/sha256-js'
+import { defaultProvider } from "@aws-sdk/credential-provider-node";
 
 const {
-    AWS_ACCESS_KEY_ID,
-    AWS_SECRET_ACCESS_KEY,
-    AWS_SESSION_TOKEN,
     AWS_REGION
   } = process.env;
 
 const sigv4 = new SignatureV4({
     service: 'appsync',
     region: AWS_REGION ?? "",
-    credentials: {
-      accessKeyId: AWS_ACCESS_KEY_ID ?? "",
-      secretAccessKey: AWS_SECRET_ACCESS_KEY ?? "",
-      sessionToken: AWS_SESSION_TOKEN,
-    },
+    credentials: defaultProvider(),
     sha256: Sha256,
 });
 

@@ -2,7 +2,7 @@ import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 import { Role } from "aws-cdk-lib/aws-iam";
 import { GraphqlApi, SourceApiAssociation, MergeType } from "aws-cdk-lib/aws-appsync";
-import {SourceApiAssociationMergeOperation} from "awscdk-appsync-utils";
+import { SourceApiAssociationMergeOperation} from "awscdk-appsync-utils";
 import { ReviewsServiceApiStack } from "./reviews-service-api-stack";
 
 export class ReviewsServiceStack extends cdk.Stack {

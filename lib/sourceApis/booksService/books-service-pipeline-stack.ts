@@ -105,9 +105,9 @@ export class BooksServicePipelineStack extends cdk.Stack {
                         integTestPolicyStatement,
                     ]
                 }),
-                new CodeBuildStep('Integ-Test-Beta-MergedApi', {
+                new CodeBuildStep('Integ-Test-Prod-MergedApi', {
                     env: {
-                        Stage: 'beta',
+                        Stage: 'prod',
                         AWS_REGION: region
                     },
                     commands: [
