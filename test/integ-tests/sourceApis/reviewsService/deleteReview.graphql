@@ -1,0 +1,12 @@
+mutation deleteReview($id: ID!) {
+    deleteReview(input: {
+        id: $id
+    }) {
+        id
+        authorId
+        bookId
+        comment
+        rating
+        reviewerId
+    }
+}

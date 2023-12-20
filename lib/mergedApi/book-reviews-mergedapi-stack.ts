@@ -15,10 +15,15 @@ export class BookReviewsMergedApiStack extends cdk.Stack {
     });
 
     this.bookReviewsMergedApi = new CfnGraphQLApi(this, 'BookReviewsMergedApi', {
-      authenticationType: "API_KEY",
+      authenticationType: "AWS_IAM",
       name: `${props.stageName}-BookReviewsMergedApi`,
       apiType: 'MERGED',
       mergedApiExecutionRoleArn: executionRole.roleArn,
+    });
+
+    new CfnOutput(this, 'BookReviewsMergedApiUrl', {
+      exportName: `${props.stageName}-BookReviewsMergedApiUrl`,
+      value: this.bookReviewsMergedApi.attrGraphQlUrl
     });
 
     new CfnOutput(this, 'BookReviewsMergedApiArn', {

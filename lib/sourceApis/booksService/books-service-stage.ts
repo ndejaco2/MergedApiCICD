@@ -1,10 +1,10 @@
 import * as cdk from "aws-cdk-lib";
 import {Construct} from "constructs";
-import {BooksServiceStack} from "./books-service-stack";
+import { BooksServiceApiStack } from "./books-service-api-stack";
 
 export class BooksServiceStage extends cdk.Stage {
     constructor(scope: Construct, id: string, props: cdk.StageProps) {
         super(scope, id, props);
-        const booksServiceStack = new BooksServiceStack(this, 'BookServiceStack', props);
+        new BooksServiceApiStack(this, 'BookServiceStack', props);
     }
 }

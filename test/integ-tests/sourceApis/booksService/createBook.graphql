@@ -1,0 +1,17 @@
+mutation createNewBook {
+    createBook(input: {
+        authorId: "1", 
+        genre: "Fantasy", 
+        publicationYear: 10,
+        publisherId: "2", 
+        title: "A book for testing"
+    }) {
+        id
+        title
+        id
+        authorId
+        genre
+        publicationYear
+        publisherId
+    }
+}

@@ -1,30 +1,37 @@
 import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
-import { AuthorsServiceApiStack } from "./authors-service-api-stack";
 import { Role } from "aws-cdk-lib/aws-iam";
 import { GraphqlApi, SourceApiAssociation, MergeType } from "aws-cdk-lib/aws-appsync";
-import {SourceApiAssociationMergeOperation} from "awscdk-appsync-utils";
+import { SourceApiAssociationMergeOperation } from "awscdk-appsync-utils";
 
-export class AuthorsServiceStack extends cdk.Stack {
+export class AuthorsServiceSourceApiAssociationStack extends cdk.Stack {
+
     constructor(scope: Construct, id: string, props: cdk.StageProps) {
         super(scope, id);
-
-        const authorsServiceApiStack = new AuthorsServiceApiStack(this, 'AuthorsServiceApiStack', props);
+        const stage = getReferenceStageName(props.stageName ?? "")
 
         const mergedApiExecutionRole = Role.fromRoleArn(this, 'MergedApiExecutionRole',
-            cdk.Fn.importValue(`${props.stageName}-BookReviewsMergedApiExecutionRoleArn`))
+            cdk.Fn.importValue(`${stage}-BookReviewsMergedApiExecutionRoleArn`))
 
-        const mergedApiArn = cdk.Fn.importValue(`${props.stageName}-BookReviewsMergedApiArn`)
-        const mergedApiId = cdk.Fn.importValue(`${props.stageName}-BookReviewsMergedApiId`)
+        const mergedApiArn = cdk.Fn.importValue(`${stage}-BookReviewsMergedApiArn`)
+        const mergedApiId = cdk.Fn.importValue(`${stage}-BookReviewsMergedApiId`)
 
         const mergedApi = GraphqlApi.fromGraphqlApiAttributes(this, 'MergedApi', {
             graphqlApiArn: mergedApiArn,
             graphqlApiId: mergedApiId,
         });
 
+        const sourceApiArn = cdk.Fn.importValue(`${stage}-AuthorsApiArn`)
+        const sourceApiId = cdk.Fn.importValue(`${stage}-AuthorsApiId`)
+
+        const sourceApi = GraphqlApi.fromGraphqlApiAttributes(this, 'SourceApi', {
+            graphqlApiArn: sourceApiArn,
+            graphqlApiId: sourceApiId,
+        });
+
         // Associates this api to the BookReviewsMergedApi
         const sourceApiAssociation = new SourceApiAssociation(this, 'BooksSourceApiAssociation', {
-            sourceApi: authorsServiceApiStack.authorsApi,
+            sourceApi: sourceApi,
             mergedApi: mergedApi,
             mergedApiExecutionRole: mergedApiExecutionRole,
             mergeType: MergeType.MANUAL_MERGE,
@@ -36,3 +43,8 @@ export class AuthorsServiceStack extends cdk.Stack {
         });
     }
 }
+
+function getReferenceStageName(stageName: string) {
+    return stageName.replace("-merged-api", "")
+}
+

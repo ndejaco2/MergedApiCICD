@@ -1,20 +1,20 @@
 import * as cdk from "aws-cdk-lib";
 import * as path from "path";
-import {Construct} from "constructs";
+import { Construct } from "constructs";
 import {
+    AuthorizationType,
     BaseDataSource,
     Code,
     DynamoDbDataSource,
     FunctionRuntime,
     GraphqlApi,
-    IGraphqlApi,
     Resolver,
     SchemaFile
 } from "aws-cdk-lib/aws-appsync";
 import {AttributeType, Table} from "aws-cdk-lib/aws-dynamodb";
 
-export class BooksServiceApiStack extends cdk.NestedStack {
-    public readonly booksApi: IGraphqlApi;
+export class BooksServiceApiStack extends cdk.Stack {
+    public readonly booksApi: GraphqlApi;
     private booksDatasource: BaseDataSource;
 
     constructor(scope: Construct, id: string, props: cdk.StageProps) {
@@ -23,8 +23,28 @@ export class BooksServiceApiStack extends cdk.NestedStack {
         const schema = SchemaFile.fromAsset(path.join(__dirname, 'books.graphql'));
         this.booksApi = new GraphqlApi(this, `BooksServiceApi`, {
             name: `${props.stageName}-Books-Service`,
-            schema: schema
+            schema: schema,
+            authorizationConfig: {
+                defaultAuthorization: {
+                    authorizationType: AuthorizationType.IAM
+                }
+            }
         });
+
+        new cdk.CfnOutput(this, 'BooksApiUrl', {
+            exportName: `${props.stageName}-BooksApiUrl`,
+            value: this.booksApi.graphqlUrl
+        });
+
+        new cdk.CfnOutput(this, 'BooksApiArn', {
+            exportName: `${props.stageName}-BooksApiArn`,
+            value: this.booksApi.arn,
+        })
+
+        new cdk.CfnOutput(this, 'BooksApiId', {
+            exportName: `${props.stageName}-BooksApiId`,
+            value: this.booksApi.apiId,
+        })
 
         const booksTable = new Table(this, `BooksDDBTable`, {
             partitionKey: {

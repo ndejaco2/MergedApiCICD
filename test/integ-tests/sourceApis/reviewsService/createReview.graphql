@@ -1,0 +1,15 @@
+mutation createNewReview {
+  createReview(input: {
+    authorId: "1", 
+    bookId: "2", 
+    comment: "I enjoyed it", 
+    rating: 9, 
+    reviewerId: "3"}) {
+        id
+        authorId
+        bookId
+        comment
+        rating
+        reviewerId
+  }
+}

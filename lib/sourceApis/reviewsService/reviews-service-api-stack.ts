@@ -2,6 +2,7 @@ import * as cdk from "aws-cdk-lib";
 import * as path from "path";
 import {Construct} from "constructs";
 import {
+    AuthorizationType,
     BaseDataSource, CfnGraphQLApi,
     Code,
     DynamoDbDataSource,
@@ -12,8 +13,8 @@ import {
 } from "aws-cdk-lib/aws-appsync";
 import {AttributeType, Table} from "aws-cdk-lib/aws-dynamodb";
 
-export class ReviewsServiceApiStack extends cdk.NestedStack {
-    public readonly reviewsApi: IGraphqlApi;
+export class ReviewsServiceApiStack extends cdk.Stack {
+    public readonly reviewsApi: GraphqlApi;
     private bookReviewsDatasource: BaseDataSource;
 
     constructor(scope: Construct, id: string, props: cdk.StageProps) {
@@ -23,8 +24,28 @@ export class ReviewsServiceApiStack extends cdk.NestedStack {
 
         this.reviewsApi = new GraphqlApi(this, 'ReviewsServiceApi', {
             name: `${props.stageName}-Reviews-Service`,
-            schema: schema
+            schema: schema,
+            authorizationConfig: {
+                defaultAuthorization: {
+                    authorizationType: AuthorizationType.IAM
+                }
+            }
         });
+
+        new cdk.CfnOutput(this, 'ReviewsApiUrl', {
+            exportName: `${props.stageName}-ReviewsApiUrl`,
+            value: this.reviewsApi.graphqlUrl
+        });
+
+        new cdk.CfnOutput(this, 'ReviewsApiArn', {
+            exportName: `${props.stageName}-ReviewsApiArn`,
+            value: this.reviewsApi.arn,
+        })
+
+        new cdk.CfnOutput(this, 'ReviewsApiId', {
+            exportName: `${props.stageName}-ReviewsApiId`,
+            value: this.reviewsApi.apiId,
+        })
 
         const bookReviewsTable = new Table(this, 'ReviewsDDBTable', {
             partitionKey: {
