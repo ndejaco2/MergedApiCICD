@@ -4,29 +4,37 @@ import {BooksServicePipelineStack} from "../lib/sourceApis/booksService/books-se
 import {BookReviewsMergedApiPipeline} from "../lib/mergedApi/book-reviews-mergedapi-pipeline";
 import {AuthorsServicePipelineStack} from "../lib/sourceApis/authorsService/authors-service-pipeline";
 import {ReviewsServicePipelineStack} from "../lib/sourceApis/reviewsService/reviews-service-pipeline";
+import { SchemaBreakingChangeDetectionStack } from '../lib/breakingChangeDetection/schema-breaking-change-detection-stack';
 
 const app = new cdk.App();
 
+const defaultRegion = 'us-east-1'
+new SchemaBreakingChangeDetectionStack(app, 'BreakingChangeDetection', {
+    env: {
+        region: defaultRegion
+    }
+});
+
 new BookReviewsMergedApiPipeline(app, 'BookReviewsMergedApiPipeline', {
     env: {
-        region: 'us-east-1',
+        region: defaultRegion
     }
 });
 
 new AuthorsServicePipelineStack(app, 'AuthorsServicePipeline', {
     env: {
-        region: 'us-east-1'
+        region: defaultRegion
     }
 });
 
 new ReviewsServicePipelineStack(app, 'ReviewsServicePipeline', {
     env: {
-        region: 'us-east-1'
+        region: defaultRegion
     },
 });
 
 new BooksServicePipelineStack(app, 'BooksServicePipeline', {
     env: {
-        region: 'us-east-1'
+        region: defaultRegion
     },
 })
