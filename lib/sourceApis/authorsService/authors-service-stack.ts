@@ -3,12 +3,15 @@ import { Construct } from "constructs";
 import { Role } from "aws-cdk-lib/aws-iam";
 import { GraphqlApi, SourceApiAssociation, MergeType } from "aws-cdk-lib/aws-appsync";
 import { SourceApiAssociationMergeOperation } from "awscdk-appsync-utils";
+import { AuthorsServiceApiStack } from "./authors-service-api-stack";
 
-export class AuthorsServiceSourceApiAssociationStack extends cdk.Stack {
+export class AuthorsServiceStack extends cdk.Stack {
 
     constructor(scope: Construct, id: string, props: cdk.StageProps) {
         super(scope, id);
-        const stage = getReferenceStageName(props.stageName ?? "")
+        const stage = props.stageName
+
+        const authorsServiceApi = new AuthorsServiceApiStack(this, 'AuthorsServiceApiStack', props)
 
         const mergedApiExecutionRole = Role.fromRoleArn(this, 'MergedApiExecutionRole',
             cdk.Fn.importValue(`${stage}-BookReviewsMergedApiExecutionRoleArn`))
@@ -21,23 +24,15 @@ export class AuthorsServiceSourceApiAssociationStack extends cdk.Stack {
             graphqlApiId: mergedApiId,
         });
 
-        const sourceApiArn = cdk.Fn.importValue(`${stage}-AuthorsApiArn`)
-        const sourceApiId = cdk.Fn.importValue(`${stage}-AuthorsApiId`)
-
-        const sourceApi = GraphqlApi.fromGraphqlApiAttributes(this, 'SourceApi', {
-            graphqlApiArn: sourceApiArn,
-            graphqlApiId: sourceApiId,
-        });
-
         // Associates this api to the BookReviewsMergedApi
         const sourceApiAssociation = new SourceApiAssociation(this, 'BooksSourceApiAssociation', {
-            sourceApi: sourceApi,
+            sourceApi: authorsServiceApi.authorsApi,
             mergedApi: mergedApi,
             mergedApiExecutionRole: mergedApiExecutionRole,
             mergeType: MergeType.MANUAL_MERGE,
         });
 
-        const mergeOperation= new SourceApiAssociationMergeOperation(this, 'SourceApiMergeOperation', {
+        const mergeOperation = new SourceApiAssociationMergeOperation(this, 'SourceApiMergeOperation', {
             sourceApiAssociation: sourceApiAssociation,
             alwaysMergeOnStackUpdate: true
         });

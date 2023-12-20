@@ -13,7 +13,7 @@ import {
 } from "aws-cdk-lib/aws-appsync";
 import {AttributeType, Table} from "aws-cdk-lib/aws-dynamodb";
 
-export class BooksServiceApiStack extends cdk.Stack {
+export class BooksServiceApiStack extends cdk.NestedStack {
     public readonly booksApi: GraphqlApi;
     private booksDatasource: BaseDataSource;
 

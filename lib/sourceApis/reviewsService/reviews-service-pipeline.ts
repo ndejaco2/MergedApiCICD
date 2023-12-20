@@ -29,13 +29,6 @@ export class ReviewsServicePipelineStack extends cdk.Stack {
             stageName: 'beta',
         });
 
-        const mergedApiBetaPromotionStage = new ReviewsServiceSourceApiAssociationStage(this, 'ReviewsServiceBetaMergeStage', {
-            env: {
-                region: region
-            },
-            stageName: 'beta-merged-api'
-        });
-
         const evaluateCodePolicyStatement = new PolicyStatement({
             actions: ["appsync:EvaluateCode"],
             resources: ["*"],
@@ -72,15 +65,10 @@ export class ReviewsServicePipelineStack extends cdk.Stack {
                     rolePolicyStatements: [
                         integTestPolicyStatement,
                     ]
-                })
-            ] 
-        })
-
-        pipeline.addStage(mergedApiBetaPromotionStage, {
-            post: [
-                new CodeBuildStep('Integ-Test-Beta-MergedApi', {
+                }),
+                new CodeBuildStep('Integ-Test-Prod-Merged-Api', {
                     env: {
-                        Stage: 'beta',
+                        Stage: 'prod',
                         AWS_REGION: region
                     },
                     commands: [
@@ -92,7 +80,7 @@ export class ReviewsServicePipelineStack extends cdk.Stack {
                         integTestPolicyStatement,
                     ]
                 })
-            ]
+            ] 
         })
 
         const sourceApiProdStage = new ReviewsServiceStage(this, "ReviewsServiceProdStage", {
@@ -100,13 +88,6 @@ export class ReviewsServicePipelineStack extends cdk.Stack {
                 region: region
             },
             stageName: 'prod'
-        });
-
-        const mergedApiProdPromotionStage = new ReviewsServiceSourceApiAssociationStage(this, "ReviewsServiceProdMergeStage", {
-            env: {
-                region: region
-            },
-            stageName: 'prod-merged-api'
         });
 
         pipeline.addStage(sourceApiProdStage, {
@@ -124,12 +105,7 @@ export class ReviewsServicePipelineStack extends cdk.Stack {
                     rolePolicyStatements: [
                         integTestPolicyStatement,
                     ]
-                })
-            ]
-        })
-
-        pipeline.addStage(mergedApiProdPromotionStage, {
-            post: [ 
+                }),
                 new CodeBuildStep('Integ-Test-Prod-Merged-Api', {
                     env: {
                         Stage: 'prod',

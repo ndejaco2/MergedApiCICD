@@ -29,13 +29,6 @@ export class BooksServicePipelineStack extends cdk.Stack {
             stageName: 'beta',
         });
 
-        const mergedApiBetaPromotionStage = new BooksServiceSourceApiAssociationStage(this, 'BooksServiceBetaMergeStage', {
-            env: {
-                region: region
-            },
-            stageName: 'beta-merged-api'
-        });
-
         const evaluateCodePolicyStatement = new PolicyStatement({
             actions: ["appsync:EvaluateCode"],
             resources: ["*"],
@@ -52,7 +45,7 @@ export class BooksServicePipelineStack extends cdk.Stack {
                     commands: [
                         "npm ci", 
                         "npm run build", 
-                        "npm test unit-tests/sourceApis/booksService"],
+                        "npm test test/unit-tests/sourceApis/booksService"],
                     rolePolicyStatements: [
                         evaluateCodePolicyStatement,
                     ]
@@ -67,17 +60,12 @@ export class BooksServicePipelineStack extends cdk.Stack {
                     commands: [
                         "npm ci",
                         "npm run build",
-                        "npm test integ-tests/sourceApis/booksService"
+                        "npm test test/integ-tests/sourceApis/booksService"
                     ],
                     rolePolicyStatements: [
                         integTestPolicyStatement,
                     ]
-                })
-            ] 
-        })
-
-        pipeline.addStage(mergedApiBetaPromotionStage, {
-            post: [
+                }),
                 new CodeBuildStep('Integ-Test-Beta-MergedApi', {
                     env: {
                         Stage: 'beta',
@@ -86,13 +74,13 @@ export class BooksServicePipelineStack extends cdk.Stack {
                     commands: [
                         "npm ci",
                         "npm run build",
-                        "npm test integ-tests/mergedApi"
+                        "npm test test/integ-tests/mergedApi"
                     ],
                     rolePolicyStatements: [
                         integTestPolicyStatement,
                     ]
                 })
-            ]
+            ] 
         })
 
         const sourceApiProdStage = new BooksServiceStage(this, "BooksServiceProdStage", {
@@ -100,13 +88,6 @@ export class BooksServicePipelineStack extends cdk.Stack {
                 region: region
             },
             stageName: 'prod'
-        });
-
-        const mergedApiProdPromotionStage = new BooksServiceSourceApiAssociationStage(this, "BooksServiceProdMergeStage", {
-            env: {
-                region: region
-            },
-            stageName: 'prod-merged-api'
         });
 
         pipeline.addStage(sourceApiProdStage, {
@@ -119,26 +100,21 @@ export class BooksServicePipelineStack extends cdk.Stack {
                     commands: [
                         "npm ci",
                         "npm run build",
-                        "npm test integ-tests/sourceApis/booksService",
+                        "npm test test/integ-tests/sourceApis/booksService",
                     ],
                     rolePolicyStatements: [
                         integTestPolicyStatement,
                     ]
-                })
-            ]
-        })
-
-        pipeline.addStage(mergedApiProdPromotionStage, {
-            post: [ 
-                new CodeBuildStep('Integ-Test-Prod-Merged-Api', {
+                }),
+                new CodeBuildStep('Integ-Test-Beta-MergedApi', {
                     env: {
-                        Stage: 'prod',
+                        Stage: 'beta',
                         AWS_REGION: region
                     },
                     commands: [
                         "npm ci",
                         "npm run build",
-                        "npm test integ-tests/mergedApi"
+                        "npm test test/integ-tests/mergedApi"
                     ],
                     rolePolicyStatements: [
                         integTestPolicyStatement,

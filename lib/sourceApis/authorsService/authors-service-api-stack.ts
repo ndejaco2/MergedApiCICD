@@ -14,7 +14,7 @@ import {
 import {AttributeType, Table} from "aws-cdk-lib/aws-dynamodb";
 ;
 
-export class AuthorsServiceApiStack extends cdk.Stack {
+export class AuthorsServiceApiStack extends cdk.NestedStack {
     private authorsDatasource: BaseDataSource;
     public readonly authorsApi: GraphqlApi;
 

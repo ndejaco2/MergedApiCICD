@@ -29,13 +29,6 @@ export class AuthorsServicePipelineStack extends cdk.Stack {
             stageName: 'beta',
         });
 
-        const mergedApiBetaPromotionStage = new AuthorsServiceSourceApiAssociationStage(this, 'AuthorsServiceBetaMergeStage', {
-            env: {
-                region: region
-            },
-            stageName: 'beta-merged-api'
-        });
-
         const evaluateCodePolicyStatement = new PolicyStatement({
             actions: ["appsync:EvaluateCode"],
             resources: ["*"],
@@ -76,37 +69,11 @@ export class AuthorsServicePipelineStack extends cdk.Stack {
             ] 
         })
 
-        pipeline.addStage(mergedApiBetaPromotionStage, {
-            post: [
-                new CodeBuildStep('Integ-Test-Beta-MergedApi', {
-                    env: {
-                        Stage: 'beta',
-                        AWS_REGION: region
-                    },
-                    commands: [
-                        "npm ci",
-                        "npm run build",
-                        "npm test integ-tests/mergedApi"
-                    ],
-                    rolePolicyStatements: [
-                        integTestPolicyStatement,
-                    ]
-                })
-            ]
-        })
-
         const sourceApiProdStage = new AuthorsServiceStage(this, "AuthorsServiceProdStage", {
             env: {
                 region: region
             },
             stageName: 'prod'
-        });
-
-        const mergedApiProdPromotionStage = new AuthorsServiceSourceApiAssociationStage(this, "AuthorsServiceProdMergeStage", {
-            env: {
-                region: region
-            },
-            stageName: 'prod-merged-api'
         });
 
         pipeline.addStage(sourceApiProdStage, {
@@ -120,25 +87,6 @@ export class AuthorsServicePipelineStack extends cdk.Stack {
                         "npm ci",
                         "npm run build",
                         "npm test integ-tests/sourceApis/authorsService",
-                    ],
-                    rolePolicyStatements: [
-                        integTestPolicyStatement,
-                    ]
-                })
-            ]
-        })
-
-        pipeline.addStage(mergedApiProdPromotionStage, {
-            post: [ 
-                new CodeBuildStep('Integ-Test-Prod-Merged-Api', {
-                    env: {
-                        Stage: 'prod',
-                        AWS_REGION: region
-                    },
-                    commands: [
-                        "npm ci",
-                        "npm run build",
-                        "npm test integ-tests/mergedApi"
                     ],
                     rolePolicyStatements: [
                         integTestPolicyStatement,
