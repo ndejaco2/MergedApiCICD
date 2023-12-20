@@ -3,10 +3,7 @@ mutation deleteReview($id: ID!) {
         id: $id
     }) {
         id
-        authorId
-        bookId
         comment
         rating
-        reviewerId
     }
 }

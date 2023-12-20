@@ -41,15 +41,15 @@ export async function executeRequest(apiUrl: URL, query: string, variables?: any
             }
         );
 
+        console.log('Successfully received data: ', data);
+
         if (data.errors) {
-            throw new Error(`Errors occurred during the request ${data.errors}`)
+            throw new Error(`Errors occurred during the request: ${data}`)
         }
 
-        console.log('Successfully received data: ', data);
         return data;
   } catch (error) {
         console.log('An error occurred', error);
-
         throw error;
   }
 }

@@ -18,7 +18,7 @@ beforeAll(async () => {
 
 test('basic integration test', async () => {
     var request = fs.readFileSync(requestCodePath + '/createBook.graphql', 'utf-8')
-    var response = await executeRequest(apiUrl, request)
+    var response = await executeRequest(apiUrl, request, { authorId: "1" })
     expect(response.data.createBook.title).toEqual("A book for testing")
     expect(response.data.createBook.genre).toEqual("Fantasy")
     expect(response.data.createBook.id).toBeDefined();

@@ -18,7 +18,7 @@ beforeAll(async () => {
 
 test('basic integration test', async () => {
     var request = fs.readFileSync(requestCodePath + '/createReview.graphql', 'utf-8')
-    var response = await executeRequest(apiUrl, request)
+    var response = await executeRequest(apiUrl, request, { authorId: "1", bookId: "2", comment: "I enjoyed it", rating: 9})
     expect(response.data.createReview.comment).toEqual("I enjoyed it")
     expect(response.data.createReview.rating).toEqual(9)
     expect(response.data.createReview.id).toBeDefined();

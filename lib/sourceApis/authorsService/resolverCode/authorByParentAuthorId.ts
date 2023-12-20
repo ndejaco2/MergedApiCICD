@@ -5,7 +5,7 @@ export function request(ctx: Context) {
     const authorId = ctx.source.authorId
     return {
         operation: 'GetItem',
-        key: util.dynamodb.toMapValues({ authorId })
+        key: util.dynamodb.toMapValues({ id: authorId })
     };
 }
 

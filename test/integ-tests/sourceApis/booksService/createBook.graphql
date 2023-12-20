@@ -1,6 +1,6 @@
-mutation createNewBook {
+mutation createNewBook($authorId: ID!) {
     createBook(input: {
-        authorId: "1", 
+        authorId: $authorId, 
         genre: "Fantasy", 
         publicationYear: 10,
         publisherId: "2", 

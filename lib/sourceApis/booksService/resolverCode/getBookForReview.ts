@@ -5,7 +5,7 @@ export function request(ctx: Context) {
     const bookId = ctx.source.bookId
     return {
         operation: 'GetItem',
-        key: util.dynamodb.toMapValues({ bookId })
+        key: util.dynamodb.toMapValues({ id: bookId })
     };
 }
 

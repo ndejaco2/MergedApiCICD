@@ -30,7 +30,7 @@ input DeleteBookInput {
 }
 
 type Review {
-    bookId: ID!
+    bookId: ID! @hidden
     book: Book
 }
 
