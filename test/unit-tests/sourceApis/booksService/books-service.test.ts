@@ -54,7 +54,7 @@ test('test get book for review resolver code request', async () => {
 
     const result = JSON.parse(response.evaluationResult)
     expect(result.operation).toEqual("GetItem")
-    expect(result.key.bookId.S).toEqual("2")
+    expect(result.key.id.S).toEqual("2")
 });
 
 test('test get books for author resolver code request', async () => {

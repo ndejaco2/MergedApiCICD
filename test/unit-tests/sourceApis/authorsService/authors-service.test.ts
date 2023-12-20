@@ -107,7 +107,7 @@ test('test author by parent author id request', async () => {
 
     const result = JSON.parse(response.evaluationResult)
     expect(result.operation).toEqual("GetItem")
-    expect(result.key.authorId.S).toEqual("2")
+    expect(result.key.id.S).toEqual("2")
 });
 
 test('test list authors request', async () => {
