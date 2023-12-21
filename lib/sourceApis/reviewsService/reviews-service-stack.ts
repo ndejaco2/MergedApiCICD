@@ -38,7 +38,3 @@ export class ReviewsServiceStack extends cdk.Stack {
         });
     }
 }
-
-function getReferenceStageName(stageName: string) {
-    return stageName.replace("-merged-api", "")
-}

@@ -36,7 +36,3 @@ export class BooksServiceStack extends cdk.Stack {
         });
     }
 }
-
-function getReferenceStageName(stageName: string) {
-    return stageName.replace("-merged-api", "")
-}

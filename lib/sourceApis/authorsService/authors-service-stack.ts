@@ -39,7 +39,3 @@ export class AuthorsServiceStack extends cdk.Stack {
     }
 }
 
-function getReferenceStageName(stageName: string) {
-    return stageName.replace("-merged-api", "")
-}
-
